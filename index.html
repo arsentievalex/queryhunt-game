@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particles.js</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Roboto', sans-serif;
+      overflow: hidden;
+    }
+
+    #particles-js {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: -1; /* Send the animation to the back */
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 1.5em;
+      margin-bottom: 50px;
+      font-weight: 400;
+      color: #ccc;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .buttons button {
+      font-size: 1.2em;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .buttons button:hover {
+      background: #555;
+      transform: scale(1.05);
+    }
+
+    .buttons button:active {
+      transform: scale(1.02);
+    }
+
+    .play {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .leaderboard {
+      background-color: #37383E;
+      color: white;
+    }
+
+    .about {
+      background-color: #37383E;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="content">
+    <h1>Welcome to QueryHunt</h1>
+    <h2>AI-powered SQL Murder Mystery Game</h2>
+    <div class="buttons">
+      <button class="play" onclick="window.open('http://localhost:8501/sql_mystery_game');">Play</button>
+      <button class="leaderboard" onclick="window.open('http://localhost:8501/leaderboard');">Leaderboard</button>
+      <button class="about" onclick="window.open('http://localhost:8501/info');">About Project</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": {
+          "value": 300,
+          "density": {
+            "enable": true,
+            "value_area": 800
+          }
+        },
+        "color": {
+          "value": "#ffffff"
+        },
+        "shape": {
+          "type": "circle",
+          "stroke": {
+            "width": 0,
+            "color": "#000000"
+          },
+          "polygon": {
+            "nb_sides": 5
+          }
+        },
+        "opacity": {
+          "value": 0.5,
+          "random": false,
+          "anim": {
+            "enable": false,
+            "speed": 1,
+            "opacity_min": 0.2,
+            "sync": false
+          }
+        },
+        "size": {
+          "value": 2,
+          "random": true,
+          "anim": {
+            "enable": false,
+            "speed": 40,
+            "size_min": 0.1,
+            "sync": false
+          }
+        },
+        "line_linked": {
+          "enable": true,
+          "distance": 100,
+          "color": "#ffffff",
+          "opacity": 0.22,
+          "width": 1
+        },
+        "move": {
+          "enable": true,
+          "speed": 0.2,
+          "direction": "none",
+          "random": false,
+          "straight": false,
+          "out_mode": "out",
+          "bounce": true,
+          "attract": {
+            "enable": false,
+            "rotateX": 600,
+            "rotateY": 1200
+          }
+        }
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": {
+          "onhover": {
+            "enable": true,
+            "mode": "grab"
+          },
+          "onclick": {
+            "enable": true,
+            "mode": "repulse"
+          },
+          "resize": true
+        },
+        "modes": {
+          "grab": {
+            "distance": 100,
+            "line_linked": {
+              "opacity": 1
+            }
+          },
+          "bubble": {
+            "distance": 400,
+            "size": 2,
+            "duration": 2,
+            "opacity": 0.5,
+            "speed": 1
+          },
+          "repulse": {
+            "distance": 200,
+            "duration": 0.4
+          },
+          "push": {
+            "particles_nb": 2
+          },
+          "remove": {
+            "particles_nb": 3
+          }
+        }
+      },
+      "retina_detect": true
+    });
+  </script>
+</body>
+</html>
