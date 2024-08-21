@@ -6,3 +6,8 @@ with open('index.html', 'r') as file:
     html_content = file.read()
 
 html(html_content, height=600)
+
+st.write(st.context.headers)
+st.write(st.context.cookies)
+
+
