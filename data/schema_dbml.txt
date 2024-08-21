@@ -1,0 +1,65 @@
+dbml
+
+Project MurderMystery {
+  database_type: "PostgreSQL"
+  Note: 'Database structure for a SQL-based murder mystery game'
+}
+
+Table Victim {
+    victim_id INT [pk, not null]
+    name VARCHAR(100)
+    age INT
+    occupation VARCHAR(100)
+    time_of_death DATETIME
+    location_of_death VARCHAR(100)
+
+    Note: "This table stores information about the murder victim, including their basic details, the time of death, and the location where they were found."
+}
+
+Table Suspects {
+    suspect_id INT [pk, not null]
+    name VARCHAR(100)
+    age INT
+    relationship_to_victim VARCHAR(100)
+    motive VARCHAR(100)
+
+    Note: "This table stores information about suspects, including their relationship to the victim and potential motives for the crime."
+}
+
+Table Alibis {
+    alibi_id INT [pk, not null]
+    suspect_id INT [ref: > Suspects.suspect_id]
+    alibi VARCHAR(255)
+    alibi_verified BOOLEAN
+    alibi_time DATETIME
+
+    Note: "This table records alibis provided by the suspects, whether the alibi has been verified, and the time associated with the alibi."
+}
+
+Table CrimeScene {
+    scene_id INT [pk, not null]
+    location VARCHAR(100)
+    description TEXT
+    evidence_found BOOLEAN
+    victim_id INT [ref: > Victim.victim_id]
+
+    Note: "This table contains details about crime scenes, including the location, a description of the scene, whether evidence was found, and the associated victim."
+}
+
+Table Evidence {
+    evidence_id INT [pk, not null]
+    description TEXT
+    found_at_location VARCHAR(100)
+    points_to_suspect_id INT [ref: > Suspects.suspect_id]
+    scene_id INT [ref: > CrimeScene.scene_id]
+
+    Note: "This table catalogs evidence found at crime scenes, including what was found, where it was found, and which suspect it may point to."
+}
+
+Table Murderer {
+    murderer_id INT [pk, not null]
+    suspect_id INT [ref: > Suspects.suspect_id]
+    name VARCHAR(100)
+
+    Note: "Admin-only table that identifies the correct murderer, linking them to the suspect table and recording their name."
+}
