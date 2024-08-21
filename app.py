@@ -9,5 +9,5 @@ pages = [
     st.Page("info.py", title="About Project")
 ]
 
-pg = st.navigation(pages, position='hidden')
+pg = st.navigation(pages, position='sidebar')
 pg.run()
