@@ -7,5 +7,4 @@ with open('index.html', 'r') as file:
 
 html(html_content, height=600)
 
-st.write(st.context.headers["X-Streamlit-User"])
 
