@@ -14,16 +14,10 @@ from llama_index.core.workflow import (
     Context,
     step,
 )
-from llama_index.core import VectorStoreIndex
-from llama_index.vector_stores.tidbvector import TiDBVectorStore
-from llama_index.llms.openai import OpenAI
 import os
-from llama_index.core.vector_stores.types import (
-    MetadataFilter,
-    MetadataFilters,
-)
 import streamlit as st
-from utils import get_connection, clean_string, is_valid_sql, is_non_destructive, get_vs_store, reset_tables, get_query_engine
+from utils import (clean_string, is_valid_sql, is_non_destructive,
+                   get_vs_store, run_queries_in_schema, get_query_engine)
 
 
 # Set your OpenAI API key
@@ -83,6 +77,15 @@ The response must contain only valid Python dictionary with the following schema
 ---------------------
 """
 
+delete_queries = [
+    "DELETE FROM Evidence;",
+    "DELETE FROM Murderer;",
+    "DELETE FROM Alibis;",
+    "DELETE FROM CrimeScene;",
+    "DELETE FROM Suspects;",
+    "DELETE FROM Victim;"
+]
+
 # Define the Pydantic models
 class Query(BaseModel):
     query: str
@@ -117,8 +120,11 @@ class ValidatedSqlEvent(Event):
 # Define the workflow
 class MysteryFlow(Workflow):
 
+    # get unique user token from streamlit headers
+    user_token = st.context.headers["X-Streamlit-User"]
+
     # clean the tables before starting the workflow
-    reset_tables()
+    run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
 
     query_engine = get_query_engine()
 
@@ -191,20 +197,17 @@ class MysteryFlow(Workflow):
     @step(pass_context=True)
     async def execute_queries(self, ctx: Context, ev: ValidatedSqlEvent) -> StopEvent | ValidationErrorEvent:
         query_dict = ev.queries
+        query_list = [query['query'] for query in query_dict['queries']]
 
         print('trying to execute queries')
+        try:
+            run_queries_in_schema(schema_name=self.user_token, query_list=query_list)
 
-        with get_connection(autocommit=True) as conn:
-            with conn.cursor() as cursor:
-                cursor.execute("SET SESSION tidb_multi_statement_mode='ON';")
-                try:
-                    for query in query_dict['queries']:
-                        cursor.execute(query['query'])
-                except Exception as e:
-                    full_traceback = traceback.format_exc()
-                    print('the error is', full_traceback)
-                    print("Failed to execute insert queries...")
-                    return ValidationErrorEvent(error=str(full_traceback), wrong_output=query_dict)
+        except Exception as e:
+            full_traceback = traceback.format_exc()
+            print('the error is', full_traceback)
+            print("Failed to execute insert queries...")
+            return ValidationErrorEvent(error=str(full_traceback), wrong_output=query_dict)
 
         print('Queries executed successfully')
 
@@ -217,8 +220,10 @@ class MysteryFlow(Workflow):
         current_retries = ctx.data.get("retries", 0)
 
         if current_retries >= self.max_retries:
-            reset_tables()  # Reset tables if max retries are reached
+            run_queries_in_schema(schema_name=self.user_token,
+                                  query_list=delete_queries)  # Reset tables if max retries are reached
             return StopEvent(result="Max retries reached")
+
         else:
             ctx.data["retries"] = current_retries + 1
 
