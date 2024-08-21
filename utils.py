@@ -11,10 +11,10 @@ from llama_index.core.vector_stores.types import (
     MetadataFilters,
 )
 from sqlglot import parse_one, errors
-import streamlit as st
+import random
 
 
-def get_connection(autocommit: bool = True) -> Connection:
+def get_connection(database: str = None, autocommit: bool = True) -> Connection:
     """
     Function that returns connection object to TiDB Serverless cluster.
     :param: autocommit
@@ -25,10 +25,12 @@ def get_connection(autocommit: bool = True) -> Connection:
         "port": 4000,
         "user": st.secrets['TIDB_USER'],
         "password": st.secrets['TIDB_PASSWORD'],
-        "database": "original_game_schema",
         "autocommit": autocommit,
         "cursorclass": DictCursor,
     }
+
+    if database:
+        db_conf["database"] = database
 
     db_conf["ssl_verify_cert"] = True
     db_conf["ssl_verify_identity"] = True
@@ -37,27 +39,20 @@ def get_connection(autocommit: bool = True) -> Connection:
     return pymysql.connect(**db_conf)
 
 
-def reset_tables():
+def run_queries_in_schema(schema_name: str, query_list: list):
     """
-    Function to delete all data from the game tables.
+    Function to execute queries within a specific schema in TiDB cluster.
+    :param schema_name: Name of the schema to use
+    :param query_list: List of SQL queries to execute
     """
-    delete_queries = [
-        "DELETE FROM Evidence;",
-        "DELETE FROM Murderer;",
-        "DELETE FROM Alibis;",
-        "DELETE FROM CrimeScene;",
-        "DELETE FROM Suspects;",
-        "DELETE FROM Victim;"
-    ]
-
-    with get_connection(autocommit=True) as conn:
+    with get_connection(database=schema_name) as conn:
         with conn.cursor() as cursor:
             cursor.execute("SET SESSION tidb_multi_statement_mode='ON';")
-            for query in delete_queries:
+            for query in query_list:
                 cursor.execute(query)
 
 
-def is_valid_query(query):
+def is_valid_query(query: str) -> bool:
     """
     Checks if the SQL query is a valid SELECT statement.
     :param: query (str): The SQL query to check.
@@ -151,4 +146,127 @@ def get_query_engine():
         filters=[MetadataFilter(key="schema", value="sql_mystery_game",
                                 operator="==")]))
     return query_engine
+
+
+def create_schema_and_tables(schema_name: str):
+    """
+    Function to create a schema and tables in TiDB cluster.
+    :param schema_name: Name of the schema to create
+    """
+    create_table_victim = f"""
+    CREATE TABLE Victim (
+        victim_id INT NOT NULL,
+        name VARCHAR(100),
+        age INT,
+        occupation VARCHAR(100),
+        time_of_death DATETIME,
+        location_of_death VARCHAR(100),
+        PRIMARY KEY (victim_id)
+    );
+    """
+
+    create_table_suspects = f"""
+    CREATE TABLE Suspects (
+        suspect_id INT NOT NULL,
+        name VARCHAR(100),
+        age INT,
+        relationship_to_victim VARCHAR(100),
+        motive VARCHAR(100),
+        PRIMARY KEY (suspect_id)
+    );
+    """
+
+    create_table_alibis = f"""
+    CREATE TABLE Alibis (
+        alibi_id INT NOT NULL,
+        suspect_id INT,
+        alibi VARCHAR(255),
+        alibi_verified BOOLEAN,
+        alibi_time DATETIME,
+        PRIMARY KEY (alibi_id),
+        FOREIGN KEY (suspect_id) REFERENCES Suspects(suspect_id)
+    );
+    """
+
+    create_table_crime_scene = f"""
+    CREATE TABLE CrimeScene (
+        scene_id INT NOT NULL,
+        location VARCHAR(100),
+        description TEXT,
+        evidence_found BOOLEAN,
+        victim_id INT,
+        PRIMARY KEY (scene_id),
+        FOREIGN KEY (victim_id) REFERENCES Victim(victim_id)
+    );
+    """
+
+    create_table_evidence = f"""
+    CREATE TABLE Evidence (
+        evidence_id INT NOT NULL,
+        description TEXT,
+        found_at_location VARCHAR(100),
+        points_to_suspect_id INT,
+        scene_id INT,
+        PRIMARY KEY (evidence_id),
+        FOREIGN KEY (points_to_suspect_id) REFERENCES Suspects(suspect_id),
+        FOREIGN KEY (scene_id) REFERENCES CrimeScene(scene_id)
+    );
+    """
+
+    create_table_murderer = f"""
+    CREATE TABLE Murderer (
+        murderer_id INT NOT NULL,
+        suspect_id INT,
+        name VARCHAR(100),
+        PRIMARY KEY (murderer_id),
+        FOREIGN KEY (suspect_id) REFERENCES Suspects(suspect_id)
+    );
+    """
+
+    table_queries = [
+        create_table_victim,
+        create_table_suspects,
+        create_table_alibis,
+        create_table_crime_scene,
+        create_table_evidence,
+        create_table_murderer
+    ]
+
+    # Step 1: Connect without specifying a database to create the schema
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(f"CREATE SCHEMA {schema_name};")
+
+    # Step 2: Reconnect with the newly created schema
+    with get_connection(database=schema_name) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SET SESSION tidb_multi_statement_mode='ON';")
+            for query in table_queries:
+                cursor.execute(query)
+
+
+def generate_username() -> str:
+    """
+    Function to generate random username for leaderboard.
+    :return: username str
+    """
+    adjectives = [
+        "Wacky", "Silly", "Cheerful", "Quirky", "Funky", "Zany", "Bubbly",
+        "Gigantic", "Mischievous", "Goofy", "Bouncy", "Sneaky", "Jolly"
+    ]
+
+    animals = [
+        "Panda", "Kangaroo", "Penguin", "Platypus", "Llama", "Elephant",
+        "Giraffe", "Dolphin", "Sloth", "Otter", "Chameleon", "Hedgehog", "Moose"
+    ]
+
+    # Generate a random username by combining an adjective, an animal, and a random number
+    adjective = random.choice(adjectives)
+    animal = random.choice(animals)
+    number = random.randint(1000, 9999)
+
+    # Combine them into a username
+    username = f"{adjective}{animal}{number}"
+
+    return username
 
