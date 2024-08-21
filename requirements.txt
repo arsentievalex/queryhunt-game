@@ -1,0 +1,11 @@
+sqlglot
+pydantic
+llama-index
+streamlit
+sqlparse
+pymysql
+streamlit-ace
+openai
+SQLAlchemy
+llama-index-vector-stores-tidbvector
+tidb-vector
