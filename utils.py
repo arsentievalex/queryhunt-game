@@ -12,6 +12,7 @@ from llama_index.core.vector_stores.types import (
 )
 from sqlglot import parse_one, errors
 import random
+import streamlit as st
 
 
 def get_connection(database: str = None, autocommit: bool = True) -> Connection:
