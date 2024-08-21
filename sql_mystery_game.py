@@ -120,7 +120,7 @@ def game_over():
     """, unsafe_allow_html=True)
 
     components.html(
-        f"""<a class="twitter-share-button" href="https://twitter.com/intent/tweet" data-text="I solved the QueryHunt game in {minutes}:{seconds:02d} min. What is your time? 🧐"  data-url="yourmist.streamlit.app" data-hashtags="SQLMurderMystery">
+        f"""<a class="twitter-share-button" href="https://twitter.com/intent/tweet" data-text="I solved the QueryHunt game in {minutes}:{seconds:02d} min. What is your time? 🧐"  data-url="https://queryhunt-game.streamlit.app/" data-hashtags="SQLMurderMystery">
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></a>
     """, width=100, height=30)
 
