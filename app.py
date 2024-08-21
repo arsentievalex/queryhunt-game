@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(layout="wide", page_icon="favicon.png")
+st.set_page_config(layout="wide", page_icon="img/favicon.png")
 
 pages = [
     st.Page("home.py", title="Home"),
