@@ -213,7 +213,7 @@ with col1:
 
 with col2:
     with st.expander('See Schema'):
-        st.image('/img/schema.svg')
+        st.image('img/schema.svg')
 
     sql_editor()
 
