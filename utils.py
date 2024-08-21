@@ -32,7 +32,7 @@ def get_connection(autocommit: bool = True) -> Connection:
 
     db_conf["ssl_verify_cert"] = True
     db_conf["ssl_verify_identity"] = True
-    db_conf["ssl_ca"] = "/etc/ssl/cert.pem"
+    db_conf["ssl_ca"] = "/etc/ssl/certs/ca-certificates.crt"
 
     return pymysql.connect(**db_conf)
 
