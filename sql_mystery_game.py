@@ -1,32 +1,21 @@
 import streamlit as st
-from pymysql import Connection
-from pymysql.cursors import DictCursor
 import pymysql
 from streamlit_ace import st_ace
-from utils import get_connection, get_vs_store, is_valid_query, get_query_engine
+from utils import get_connection, is_valid_query, get_query_engine, create_schema_and_tables, generate_username
 import pandas as pd
 from workflow import run_workflow
 import asyncio
-from llama_index.core.vector_stores.types import (
-    MetadataFilter,
-    MetadataFilters,
-)
-from llama_index.llms.openai import OpenAI
 import time
 from datetime import datetime
 import streamlit.components.v1 as components
-import random
+from pymysql.err import ProgrammingError
 
-
-@st.cache_resource
-def get_db_session():
-    return get_connection()
 
 @st.fragment
 def show_hint(hint_prompt):
     hint_button = st.button('Get Hint 🪄')
 
-    if hint_button:
+    if hint_button and st.session_state.ai_story is not None:
         query_engine = get_query_engine()
         response = query_engine.query(hint_prompt.format(story=st.session_state.ai_story,
                                                          queries=st.session_state.user_queries,
@@ -47,13 +36,14 @@ def show_hint(hint_prompt):
 def check_solution():
     user_solution = st.text_input("Who's the murderer?", label_visibility='collapsed',
                                   placeholder="Who's the murderer? Insert full name")
-    if user_solution:
+
+    if user_solution and st.session_state.ai_story is not None:
 
         # add to session state
         st.session_state.user_solutions.append(user_solution)
 
         # get correct solution
-        with get_connection(autocommit=True) as conn:
+        with get_connection(autocommit=True, database=st.session_state.current_user) as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT name from Murderer;")
                 data = cursor.fetchall()
@@ -68,7 +58,7 @@ def check_solution():
             st.balloons()
 
             # show dialog window
-            game_over()
+            end_game()
         else:
             st.warning("Not exactly...try again!")
 
@@ -89,12 +79,12 @@ def sql_editor():
         key="ace",
     )
 
-    if sql_query:
+    if sql_query and st.session_state.ai_story is not None:
         if not is_valid_query(sql_query):
             st.error("Wrong query syntax or non-Select statement. Please provide a valid SQL query.")
         else:
             try:
-                with get_connection(autocommit=True) as conn:
+                with get_connection(autocommit=True, database=st.session_state.current_user) as conn:
                     with conn.cursor() as cursor:
                         cursor.execute(sql_query)
                         data = cursor.fetchall()
@@ -109,7 +99,7 @@ def sql_editor():
 
 
 @st.dialog("Woo hoo!")
-def game_over():
+def end_game():
 
     minutes = int(st.session_state.elapsed_time // 60)
     seconds = int(st.session_state.elapsed_time % 60)
@@ -128,14 +118,6 @@ def game_over():
     add_to_leaderboard()
 
 
-def generate_username():
-    random_number = random.randint(100000, 999999)
-    username = f"user_{random_number}"
-
-    if st.session_state.current_user is None:
-        st.session_state.current_user = username
-
-
 def add_to_leaderboard():
     # Get today's date
     today_date = datetime.today().strftime('%Y-%m-%d')
@@ -145,11 +127,18 @@ def add_to_leaderboard():
     VALUES (%s, %s, %s);
     """
 
-    values = (st.session_state.current_user, today_date, int(st.session_state.elapsed_time))
+    random_username = generate_username()
+    values = (random_username, today_date, int(st.session_state.elapsed_time))
 
-    with get_connection(autocommit=True) as conn:
+    with get_connection(autocommit=True, database="original_game_schema") as conn:
         with conn.cursor() as cursor:
             cursor.execute(query, values)
+
+
+def get_current_user():
+    user_token = st.context.headers["X-Streamlit-User"]
+    if st.session_state.current_user is None:
+        st.session_state.current_user = user_token
 
 
 HINT_PROMPT = """
@@ -174,9 +163,6 @@ Here are your previous hints:
 """
 
 
-# wide layout
-# st.set_page_config(layout="wide", initial_sidebar_state='collapsed')
-
 # initiate session state dicts
 if "user_queries" not in st.session_state:
     st.session_state.user_queries = []
@@ -198,14 +184,28 @@ if "current_user" not in st.session_state:
 
 st.title("SQL Murder Mystery Game")
 
-# generate random username and add to session state
-generate_username()
+# get unique user token from headers and add to session state
+get_current_user()
 
 col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Generate Story"):
-        result = asyncio.run(run_workflow())
+
+        # create temporary schema and tables for the current user
+        with st.spinner("Loading temporary environment..."):
+            try:
+                create_schema_and_tables(schema_name=st.session_state.current_user)
+
+            # handle situation when schema already exists for a user
+            except ProgrammingError:
+                pass
+
+        # run the workflow
+        try:
+            result = asyncio.run(run_workflow())
+        except:
+            st.error("Oops...something went wrong. Please try again!")
 
         # add to session state
         st.session_state.ai_story = result['story']
@@ -213,7 +213,7 @@ with col1:
 
 with col2:
     with st.expander('See Schema'):
-        st.image('schema.svg')
+        st.image('/img/schema.svg')
 
     sql_editor()
 
@@ -224,9 +224,4 @@ with col2:
 
     with col4:
         show_hint(hint_prompt=HINT_PROMPT)
-
-
-
-
-
 
