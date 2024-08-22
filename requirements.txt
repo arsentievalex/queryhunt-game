@@ -1,6 +1,7 @@
 sqlglot
 pydantic
 llama-index==0.10.65
+llama-index-core==0.10.65
 streamlit==1.37.1
 sqlparse
 pymysql
