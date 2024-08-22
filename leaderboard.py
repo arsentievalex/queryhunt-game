@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import get_connection
+from utils.utils import get_connection
 import pandas as pd
 
 st.title("Leaderboard 🏆")
