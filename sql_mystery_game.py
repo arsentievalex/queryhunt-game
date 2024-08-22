@@ -204,12 +204,11 @@ with col1:
         # run the workflow
         try:
             result = asyncio.run(run_workflow())
+            # add to session state
+            st.session_state.ai_story = result['story']
+            st.session_state.start_time = time.time()
         except:
             st.error("Oops...something went wrong. Please try again!")
-
-        # add to session state
-        st.session_state.ai_story = result['story']
-        st.session_state.start_time = time.time()
 
 with col2:
     with st.expander('See Schema'):
