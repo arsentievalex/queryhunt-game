@@ -42,6 +42,6 @@ To set up and run QueryHunt locally:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/yourusername/QueryHunt.git
-   cd QueryHunt
+   git clone https://github.com/arsentievalex/QueryHunt.git
+
 
