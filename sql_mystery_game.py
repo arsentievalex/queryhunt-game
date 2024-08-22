@@ -207,8 +207,9 @@ with col1:
             # add to session state
             st.session_state.ai_story = result['story']
             st.session_state.start_time = time.time()
-        except:
+        except Exception as e:
             st.error("Oops...something went wrong. Please try again!")
+            st.write(e)
 
 with col2:
     with st.expander('See Schema'):
