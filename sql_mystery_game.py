@@ -1,9 +1,9 @@
 import streamlit as st
 import pymysql
 from streamlit_ace import st_ace
-from utils import get_connection, is_valid_query, get_query_engine, create_schema_and_tables, generate_username
+from utils.utils import get_connection, is_valid_query, get_query_engine, create_schema_and_tables, generate_username
 import pandas as pd
-from workflow import run_workflow
+from utils.workflow import run_workflow
 import asyncio
 import time
 from datetime import datetime
