@@ -123,6 +123,8 @@ class MysteryFlow(Workflow):
     # get unique user token from streamlit headers
     user_token = st.context.headers["X-Streamlit-User"]
 
+    st.print("token in workflow: ", user_token)
+
     # clean the tables before starting the workflow
     run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
 
