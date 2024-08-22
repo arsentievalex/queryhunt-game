@@ -43,3 +43,7 @@ To set up and run QueryHunt locally:
 1. **Clone the Repository:**
    ```bash
    git clone https://github.com/arsentievalex/queryhunt-game.git
+
+2. **Run entrypoint app.py:**
+   ```bash
+   streamlit run app.py
