@@ -16,7 +16,7 @@ from llama_index.core.workflow import (
 )
 import os
 import streamlit as st
-from utils import (clean_string, is_valid_sql, is_non_destructive,
+from utils.utils import (clean_string, is_valid_sql, is_non_destructive,
                    get_vs_store, run_queries_in_schema, get_query_engine)
 
 
