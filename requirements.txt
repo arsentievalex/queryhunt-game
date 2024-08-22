@@ -10,4 +10,3 @@ openai
 SQLAlchemy
 llama-index-vector-stores-tidbvector==0.1.2
 tidb-vector==0.0.11
-nltk==3.8.1
