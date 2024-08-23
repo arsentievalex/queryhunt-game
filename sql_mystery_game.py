@@ -211,7 +211,7 @@ with col1:
             st.session_state.start_time = time.time()
         except Exception as e:
             st.error("Oops...something went wrong. Please try again!")
-            #st.write(e)
+            st.write(e)
 
 with col2:
     with st.expander('See Schema'):
