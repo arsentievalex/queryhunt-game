@@ -16,10 +16,12 @@ def show_hint(hint_prompt):
     hint_button = st.button('Get Hint 🪄')
 
     if hint_button and st.session_state.ai_story is not None:
-        query_engine = get_query_engine()
-        response = query_engine.query(hint_prompt.format(story=st.session_state.ai_story,
-                                                         queries=st.session_state.user_queries,
-                                                         hints=st.session_state.ai_hints))
+        with st.spinner("Thinking..."):
+            
+            query_engine = get_query_engine()
+            response = query_engine.query(hint_prompt.format(story=st.session_state.ai_story,
+                                                             queries=st.session_state.user_queries,
+                                                             hints=st.session_state.ai_hints))
 
         hint_chunks = []
 
