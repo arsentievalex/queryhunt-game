@@ -206,6 +206,8 @@ if "current_user" not in st.session_state:
 
 st.title("SQL Murder Mystery Game")
 
+st.write(st.session_state.ai_story)
+
 # get unique user token from headers and add to session state
 get_current_user()
 
@@ -213,16 +215,6 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Generate Story"):
-
-        # create temporary schema and tables for the current user
-        with st.spinner("Loading temporary environment..."):
-            try:
-                create_schema_and_tables(schema_name=st.session_state.current_user)
-
-            # handle situation when schema already exists for a user
-            except ProgrammingError:
-                pass
-
         # run the workflow
         try:
             result = asyncio.run(run_workflow())
