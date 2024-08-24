@@ -37,9 +37,7 @@ Below is representation of the Llama-Index workflow that is used to orchestrate 
 <img src="https://i.postimg.cc/7LpS7xgj/Llama-Index-Workflow.png"/>
 
 
-
-[Watch the video on YouTube](https://youtu.be/IEwo6FUG1PY)
-
+[Watch the demo video on YouTube](https://youtu.be/IEwo6FUG1PY)
 
 
 ## Getting Started
