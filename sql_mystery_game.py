@@ -1,7 +1,7 @@
 import streamlit as st
 import pymysql
 from streamlit_ace import st_ace
-from utils.utils import get_connection, is_valid_query, get_query_engine, create_schema_and_tables, generate_username
+from utils.utils import get_connection, is_valid_query, get_query_engine, create_schema_and_tables, generate_username, run_queries
 import pandas as pd
 from utils.workflow import run_workflow
 import asyncio
@@ -120,6 +120,9 @@ def end_game():
     # append result to TiDB table
     add_to_leaderboard()
 
+    # drop schema
+    drop_temp_schema()
+
 
 def add_to_leaderboard():
     # Get today's date
@@ -136,6 +139,20 @@ def add_to_leaderboard():
     with get_connection(autocommit=True, database="original_game_schema") as conn:
         with conn.cursor() as cursor:
             cursor.execute(query, values)
+
+
+def drop_temp_schema():
+    # Get the current user's schema name
+    schema_name = st.session_state.get('current_user')
+    
+    if schema_name:
+        # Drop the temp schema safely using a parameterized query
+        query = "DROP SCHEMA IF EXISTS %s;"
+        
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (schema_name,))
+                conn.commit()
 
 
 def get_current_user():
