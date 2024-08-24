@@ -159,7 +159,7 @@ class MysteryFlow(Workflow):
             
         prompt = QUERY_PROMPT.format(schema=QueryCollection.schema_json(), story=ev.story)
 
-        response = self.query_engine.query(prompt)
+        response = query_engine.query(prompt)
         #response = await self.llm.acomplete(prompt)
         return CreateTablesEvent(output=str(response))
 
