@@ -44,11 +44,14 @@ To set up and run QueryHunt locally:
    ```bash
    git clone https://github.com/arsentievalex/queryhunt-game.git
 
-
 2. **Install the required packages:**
    ```bash
    cd queryhunt-game pip install -r requirements.txt
 
-3. **Run entrypoint app.py:**
+3. **Replace the following secrets with your credentials:**
+   ```bash
+   st.secrets["OPENAI_API_KEY"], st.secrets["TIDB_CONNECTION_URL"], st.secrets["TIDB_USER"], st.secrets["TIDB_PASSWORD"]
+
+4. **Run entrypoint app.py:**
    ```bash
    streamlit run app.py
