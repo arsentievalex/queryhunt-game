@@ -128,7 +128,7 @@ class MysteryFlow(Workflow):
 
     # get unique user token from streamlit headers
     user_token = st.context.headers["X-Streamlit-User"]
-
+    
     max_retries: int = 3
 
     @step(pass_context=True)
@@ -153,10 +153,7 @@ class MysteryFlow(Workflow):
 
     @step()
     async def generate_tables(self, ev: StoryEvent) -> CreateTablesEvent:
-
-        run_queries_in_schema(schema_name=self.user_token,
-                                  query_list=delete_queries)
-            
+ 
         prompt = QUERY_PROMPT.format(schema=QueryCollection.schema_json(), story=ev.story)
 
         response = query_engine.query(prompt)
