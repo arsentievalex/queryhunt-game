@@ -225,5 +225,6 @@ with col2:
         check_solution()
 
     with col4:
+        st.write(st.context.headers["X-Streamlit-User"])
         show_hint(hint_prompt=HINT_PROMPT)
 
