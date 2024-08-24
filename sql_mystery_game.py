@@ -147,12 +147,12 @@ def drop_temp_schema():
     schema_name = st.session_state.current_user
     
     if schema_name:
-        # Drop the temp schema safely using a parameterized query
-        query = "DROP SCHEMA IF EXISTS %s;"
+        # Drop the temp schema by safely constructing the query
+        query = f"DROP SCHEMA IF EXISTS `{schema_name}`;"
         
         with get_connection(autocommit=True) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query, (schema_name))
+                cursor.execute(query)
 
 
 def get_current_user():
