@@ -13,6 +13,8 @@ from llama_index.core.vector_stores.types import (
 from sqlglot import parse_one, errors
 import random
 import streamlit as st
+from sqlalchemy.exc import OperationalError
+import time
 
 
 def get_connection(database: str = None, autocommit: bool = True) -> Connection:
@@ -122,21 +124,44 @@ def clean_string(input_string: str) -> str:
 
 
 @st.cache_resource
-def get_vs_store():
+def get_vs_store(retries=3, delay=5):
     """
-    Get the vector store index from TiDB Vector Store.
+    Get the vector store index from TiDB Vector Store with retry logic.
+    :param retries: Number of retry attempts in case of failure.
+    :param delay: Delay between retries in seconds.
     :return: VectorStoreIndex
     """
     vs_table_name = "vs_game_schema"
-    tidbvec = TiDBVectorStore(
-        connection_string=st.secrets["TIDB_CONNECTION_URL"],
-        table_name=vs_table_name,
-        distance_strategy="cosine",
-        vector_dimension=1536,
-        drop_existing_table=False,
-    )
-    return VectorStoreIndex.from_vector_store(vector_store=tidbvec)
+    
+    for attempt in range(retries):
+        try:
+            tidbvec = TiDBVectorStore(
+                connection_string=st.secrets["TIDB_CONNECTION_URL"],
+                table_name=vs_table_name,
+                distance_strategy="cosine",
+                vector_dimension=1536,
+                drop_existing_table=False,
+            )
+            return VectorStoreIndex.from_vector_store(vector_store=tidbvec)
+        
+        except OperationalError as e:
+            if attempt < retries - 1:
+                st.warning(f"Connection error: {e}. Retrying in {delay} seconds...")
+                time.sleep(delay)
+            else:
+                st.error(f"Failed to connect to the database after {retries} attempts.")
+                raise  # Re-raise the exception if all retries fail
 
+
+def get_vs_store_with_retry(retries=3, delay=5):
+    for attempt in range(retries):
+        try:
+            return get_vs_store()
+        except OperationalError as e:
+            if attempt < retries - 1:
+                time.sleep(delay)
+            else:
+                raise e
 
 def get_query_engine(vs_store):
 
