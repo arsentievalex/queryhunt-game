@@ -138,7 +138,7 @@ def add_to_leaderboard():
 
 
 def get_current_user():
-    user_token = st.context.headers["X-Streamlit-User"]
+    user_token = st.context.headers["Sec-Websocket-Key"]
     if st.session_state.current_user is None:
         st.session_state.current_user = user_token
 
@@ -225,6 +225,5 @@ with col2:
         check_solution()
 
     with col4:
-        st.write(st.context.headers)
         show_hint(hint_prompt=HINT_PROMPT)
 
