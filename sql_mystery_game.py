@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 import streamlit.components.v1 as components
 from pymysql.err import ProgrammingError
+import re
 
 
 @st.fragment
@@ -139,8 +140,10 @@ def add_to_leaderboard():
 
 def get_current_user():
     user_token = st.context.headers["Sec-Websocket-Key"]
+    clean_token = re.sub(r'[^A-Za-z0-9]', '', user_token)
+    
     if st.session_state.current_user is None:
-        st.session_state.current_user = user_token
+        st.session_state.current_user = clean_token
 
 
 HINT_PROMPT = """
