@@ -137,12 +137,11 @@ def get_vs_store():
     return VectorStoreIndex.from_vector_store(vector_store=tidbvec)
 
 
-def get_query_engine():
+def get_query_engine(vs_store):
 
     llm = OpenAI("gpt-4o-mini", temperature=1)
+    
     # Create the query engine using the loaded index
-    vs_store = get_vs_store()
-
     query_engine = vs_store.as_query_engine(llm=llm, streaming=True, filters=MetadataFilters(
         filters=[MetadataFilter(key="schema", value="sql_mystery_game",
                                 operator="==")]))
