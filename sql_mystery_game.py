@@ -207,8 +207,6 @@ st.title("SQL Murder Mystery Game")
 # get unique user token from headers and add to session state
 get_current_user()
 
-st.write(st.session_state.current_user)
-
 col1, col2 = st.columns(2)
 
 with col1:
