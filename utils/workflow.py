@@ -86,11 +86,6 @@ delete_queries = [
     "DELETE FROM Victim;"
 ]
 
-config_queries = [
-    "SET GLOBAL wait_timeout = 7200;",
-    "SET GLOBAL interactive_timeout = 7200;",
-    "SET GLOBAL max_allowed_packet = 1073741824;"
-]
 
 # Define the Pydantic models
 class Query(BaseModel):
@@ -123,36 +118,23 @@ class ValidatedSqlEvent(Event):
     queries: dict
 
 
+# initialize vector store and create query index
+vs_store = get_vs_store()
+query_engine = get_query_engine(vs_store)
+
+
 # Define the workflow
 class MysteryFlow(Workflow):
 
     # get unique user token from streamlit headers
-    web_socket_key = st.context.headers["X-Streamlit-User"]
-    user_token = re.sub(r'[^A-Za-z0-9]', '', web_socket_key)
-
-    try:
-        create_schema_and_tables(schema_name=user_token)
-
-    # handle situation when schema already exists for a user
-    except ProgrammingError:
-        pass
-
-    # run config queries
-    run_queries_in_schema(schema_name=user_token, query_list=config_queries)
-
-    # clean the tables before starting the workflow
-    run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
-
-    # initialize vector store and create query index
-    vs_store = get_vs_store()
-    query_engine = get_query_engine(vs_store)
+    user_token = st.context.headers["X-Streamlit-User"]
 
     max_retries: int = 3
 
     @step(pass_context=True)
     async def generate_story(self, ctx: Context, ev: StartEvent) -> StoryEvent:
 
-        response = self.query_engine.query(STORY_PROMPT)
+        response = query_engine.query(STORY_PROMPT)
 
         story_chunks = []
 
@@ -171,6 +153,10 @@ class MysteryFlow(Workflow):
 
     @step()
     async def generate_tables(self, ev: StoryEvent) -> CreateTablesEvent:
+
+        run_queries_in_schema(schema_name=self.user_token,
+                                  query_list=delete_queries)
+            
         prompt = QUERY_PROMPT.format(schema=QueryCollection.schema_json(), story=ev.story)
 
         response = self.query_engine.query(prompt)
@@ -247,7 +233,7 @@ class MysteryFlow(Workflow):
             ctx.data["retries"] = current_retries + 1
 
             reflection_prompt = QUERY_REFLECTION_PROMPT.format(wrong_answer=str(ev.wrong_output), error=str(ev.error))
-            response = self.query_engine.query(reflection_prompt)
+            response = query_engine.query(reflection_prompt)
 
             # Convert or extract the response to a suitable type
             if isinstance(response, str):
