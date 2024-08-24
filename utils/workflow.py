@@ -17,7 +17,7 @@ from llama_index.core.workflow import (
 import os
 import streamlit as st
 from utils.utils import (clean_string, is_valid_sql, is_non_destructive,
-                   get_vs_store, run_queries_in_schema, get_query_engine)
+                   get_vs_store, run_queries_in_schema, get_query_engine, create_schema_and_tables)
 
 
 # Set your OpenAI API key
@@ -129,11 +129,15 @@ class MysteryFlow(Workflow):
     # get unique user token from streamlit headers
     user_token = st.context.headers["Sec-Websocket-Key"]
 
-    # run config queries
-    run_queries_in_schema(schema_name=user_token, query_list=config_queries)
-
-    # clean the tables before starting the workflow
-    run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
+    try:
+        create_schema_and_tables(schema_name=user_token)
+    
+        # run config queries
+        run_queries_in_schema(schema_name=user_token, query_list=config_queries)
+    
+        # clean the tables before starting the workflow
+        run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
+    pass
 
     # initialize vector store and create query index
     vs_store = get_vs_store()
