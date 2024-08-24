@@ -208,7 +208,7 @@ with col1:
 
         # run the workflow
         try:
-            result = asyncio.run(run_workflow())
+            result = run_workflow()
             # add to session state
             st.session_state.ai_story = result['story']
             st.session_state.start_time = time.time()
