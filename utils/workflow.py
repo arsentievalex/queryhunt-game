@@ -258,6 +258,6 @@ async def run_workflow():
     result = await w.run()
     return result
 
-if __name__ == "__main__":
-    asyncio.run(run_workflow())
+# if __name__ == "__main__":
+#     asyncio.run(run_workflow())
 
