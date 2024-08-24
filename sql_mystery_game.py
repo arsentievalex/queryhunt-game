@@ -232,20 +232,12 @@ with col1:
             st.session_state.ai_story = result['story']
             st.session_state.start_time = time.time()
 
-        except:
-            time.sleep(5)
-            try:
-                result = asyncio.run(run_workflow())
-            
-                # add to session state
-                st.session_state.ai_story = result['story']
-                st.session_state.start_time = time.time()
-                
-            except Exception as e:
-                st.error("Oops...something went wrong. Please try again!")
-                # for debugging
-                st.error(e)
-                
+        except Exception as e:
+            st.error("Oops...something went wrong. Please try again!")
+            # for debugging
+            st.error(e)
+
+
 with col2:
     with st.expander('See Schema'):
         st.image('img/schema.svg')
