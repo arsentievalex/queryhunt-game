@@ -86,6 +86,12 @@ delete_queries = [
     "DELETE FROM Victim;"
 ]
 
+config_queries = [
+    "SET GLOBAL wait_timeout = 7200;",
+    "SET GLOBAL interactive_timeout = 7200;",
+    "SET GLOBAL max_allowed_packet = 1073741824;"
+]
+
 # Define the Pydantic models
 class Query(BaseModel):
     query: str
@@ -122,6 +128,9 @@ class MysteryFlow(Workflow):
 
     # get unique user token from streamlit headers
     user_token = st.context.headers["X-Streamlit-User"]
+
+    # run config queries
+    run_queries_in_schema(schema_name=user_token, query_list=config_queries)
 
     # clean the tables before starting the workflow
     run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
