@@ -127,18 +127,13 @@ class ValidatedSqlEvent(Event):
 class MysteryFlow(Workflow):
 
     # get unique user token from streamlit headers
-    user_token = st.context.headers["Sec-Websocket-Key"]
+    user_token = st.session_state.current_user
 
-    try:
-        create_schema_and_tables(schema_name=user_token)
-    
-        # run config queries
-        run_queries_in_schema(schema_name=user_token, query_list=config_queries)
-    
-        # clean the tables before starting the workflow
-        run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
-    except:
-        pass
+    # run config queries
+    run_queries_in_schema(schema_name=user_token, query_list=config_queries)
+
+    # clean the tables before starting the workflow
+    run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
 
     # initialize vector store and create query index
     vs_store = get_vs_store()
