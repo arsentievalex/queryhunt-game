@@ -1,7 +1,7 @@
 import streamlit as st
 import pymysql
 from streamlit_ace import st_ace
-from utils.utils import get_connection, is_valid_query, get_query_engine, create_schema_and_tables, generate_username, run_queries_in_schema
+from utils.utils import get_connection, is_valid_query, get_query_engine, get_vs_store, create_schema_and_tables, generate_username, run_queries_in_schema
 import pandas as pd
 from utils.workflow import run_workflow
 import asyncio
@@ -19,6 +19,7 @@ def show_hint(hint_prompt):
     if hint_button and st.session_state.ai_story is not None:
         with st.spinner("Thinking..."):
             
+            vs_store = get_vs_store
             query_engine = get_query_engine(vs_store)
             response = query_engine.query(hint_prompt.format(story=st.session_state.ai_story,
                                                              queries=st.session_state.user_queries,
