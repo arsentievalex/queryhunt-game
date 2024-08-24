@@ -149,7 +149,7 @@ def drop_temp_schema():
         # Drop the temp schema safely using a parameterized query
         query = "DROP SCHEMA IF EXISTS %s;"
         
-        with get_connection(autocommit=True) as conn
+        with get_connection(autocommit=True) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(query, (schema_name))
 
