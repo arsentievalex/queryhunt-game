@@ -15,6 +15,7 @@ import random
 import streamlit as st
 
 
+@st.cache_resource
 def get_connection(database: str = None, autocommit: bool = True) -> Connection:
     """
     Function that returns connection object to TiDB Serverless cluster.
@@ -121,6 +122,7 @@ def clean_string(input_string: str) -> str:
     return cleaned_string
 
 
+@st.cache_resource
 def get_vs_store():
     """
     Get the vector store index from TiDB Vector Store.
@@ -137,6 +139,7 @@ def get_vs_store():
     return VectorStoreIndex.from_vector_store(vector_store=tidbvec)
 
 
+@st.cache_resource
 def get_query_engine(vs_store):
 
     llm = OpenAI("gpt-4o-mini", temperature=1)
