@@ -127,7 +127,7 @@ class ValidatedSqlEvent(Event):
 class MysteryFlow(Workflow):
 
     # get unique user token from streamlit headers
-    user_token = st.context.headers["X-Streamlit-User"]
+    user_token = st.context.headers["Sec-Websocket-Key"]
 
     # run config queries
     run_queries_in_schema(schema_name=user_token, query_list=config_queries)
