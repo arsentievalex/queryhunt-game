@@ -139,8 +139,7 @@ def get_vs_store():
     return VectorStoreIndex.from_vector_store(vector_store=tidbvec)
 
 
-@st.cache_resource
-def get_query_engine(_vs_store):
+def get_query_engine(vs_store):
 
     llm = OpenAI("gpt-4o-mini", temperature=1)
     
