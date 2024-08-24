@@ -156,10 +156,9 @@ def drop_temp_schema():
 
 def get_current_user():
     user_token = st.context.headers["X-Streamlit-User"]
-    clean_token = re.sub(r'[^A-Za-z0-9]', '', user_token)
     
     if st.session_state.current_user is None:
-        st.session_state.current_user = clean_token
+        st.session_state.current_user = user_token
 
 
 HINT_PROMPT = """
@@ -212,16 +211,38 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Generate Story"):
+        
+        # create temporary schema and tables for the current user
+        with st.spinner("Loading temporary environment..."):
+            try:
+                create_schema_and_tables(schema_name=st.session_state.current_user)
+
+            # handle situation when schema already exists for a user
+            except ProgrammingError:
+                pass
+        
         # run the workflow
         try:
             result = asyncio.run(run_workflow())
+            
             # add to session state
             st.session_state.ai_story = result['story']
             st.session_state.start_time = time.time()
-        except Exception as e:
-            st.error("Oops...something went wrong. Please try again!")
-            st.write(e)
 
+        except:
+            time.sleep(5)
+            try:
+                result = asyncio.run(run_workflow())
+            
+                # add to session state
+                st.session_state.ai_story = result['story']
+                st.session_state.start_time = time.time()
+                
+            except Exception as e:
+                st.error("Oops...something went wrong. Please try again!")
+                # for debugging
+                st.error(e)
+                
 with col2:
     with st.expander('See Schema'):
         st.image('img/schema.svg')
