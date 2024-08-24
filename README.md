@@ -12,7 +12,7 @@
 
 - **Engaging Gameplay:** Players use SQL queries to explore data and identify the murderer in a dynamically generated story.
 - **AI-Powered Hints:** An AI assistant provides hints based on previous queries to guide players toward the correct solution.
-- **Cutting-Edge Tech Stack:** The game leverages TiDB Serverless, GPT-4, and open-source libraries to deliver a smooth and modern experience.
+- **Modern Tech Stack:** The game leverages TiDB Serverless, GPT-4o mini, and open-source libraries to deliver a smooth and modern experience.
 - **Scalable and Unique:** Each game session is unique, with new stories and data generated every time, ensuring a fresh challenge for every player.
 
 ## Tech Stack
@@ -20,6 +20,7 @@
 - **TiDB Serverless:** Stores AI-generated temporary game data, including tables for Victim, Suspects, Evidence, Alibis, and more.
 - **TiDB VectorSearch:** Ensures the AI generates valid SQL queries by referencing schema embeddings stored in the vs_game_schema table.
 - **Llama-Index:** Manages the workflow for generating and validating game data, including self-healing processes.
+- **OpenAI:** GPT-4o mini model generates unique game stories, data and personalized hints for a player.
 - **Streamlit:** Provides the user interface, including a custom SQL editor for running queries.
 
 ## How It Works
@@ -34,6 +35,11 @@
 Below is representation of the Llama-Index workflow that is used to orchestrate multiple LLM calls and ingestion of temporary game data into TiDB Serverless.
 
 <img src="https://i.postimg.cc/7LpS7xgj/Llama-Index-Workflow.png"/>
+
+
+
+[Watch the video on YouTube](https://youtu.be/IEwo6FUG1PY)
+
 
 
 ## Getting Started
