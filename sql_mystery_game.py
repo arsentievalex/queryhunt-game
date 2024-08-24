@@ -182,6 +182,15 @@ Here are your previous hints:
 ---------------------
 """
 
+# for resetting temp db
+delete_queries = [
+    "DELETE FROM Evidence;",
+    "DELETE FROM Murderer;",
+    "DELETE FROM Alibis;",
+    "DELETE FROM CrimeScene;",
+    "DELETE FROM Suspects;",
+    "DELETE FROM Victim;"
+]
 
 # initiate session state dicts
 if "user_queries" not in st.session_state:
@@ -217,11 +226,11 @@ with col1:
             try:
                 create_schema_and_tables(schema_name=st.session_state.current_user)
 
-            # handle situation when schema already exists for a user
-            except Exception as e:
-                # for debugging
-                # st.error(e)
-                pass
+            # handle situation when schema already exists for a user, reset tables
+            except ProgrammingError:
+                run_queries_in_schema(schema_name=st.session_state.current_user,
+                          query_list=delete_queries)
+
         
         # run the workflow
         try:
