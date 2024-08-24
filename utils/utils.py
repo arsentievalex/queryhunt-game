@@ -140,7 +140,7 @@ def get_vs_store():
 
 
 @st.cache_resource
-def get_query_engine(vs_store):
+def get_query_engine(_vs_store):
 
     llm = OpenAI("gpt-4o-mini", temperature=1)
     
