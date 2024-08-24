@@ -15,7 +15,6 @@ import random
 import streamlit as st
 
 
-@st.cache_resource
 def get_connection(database: str = None, autocommit: bool = True) -> Connection:
     """
     Function that returns connection object to TiDB Serverless cluster.
