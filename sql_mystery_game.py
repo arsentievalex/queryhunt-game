@@ -219,6 +219,7 @@ with col1:
 
             # handle situation when schema already exists for a user
             except Exception as e:
+                # for debugging
                 st.error(e)
                 pass
         
