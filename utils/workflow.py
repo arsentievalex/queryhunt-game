@@ -137,7 +137,8 @@ class MysteryFlow(Workflow):
     
         # clean the tables before starting the workflow
         run_queries_in_schema(schema_name=user_token, query_list=delete_queries)
-    pass
+    except:
+        pass
 
     # initialize vector store and create query index
     vs_store = get_vs_store()
