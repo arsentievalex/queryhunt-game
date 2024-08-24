@@ -205,8 +205,6 @@ if "current_user" not in st.session_state:
 
 st.title("SQL Murder Mystery Game")
 
-st.write(st.session_state.ai_story)
-
 # get unique user token from headers and add to session state
 get_current_user()
 
