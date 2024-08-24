@@ -130,6 +130,13 @@ class MysteryFlow(Workflow):
     web_socket_key = st.context.headers["Sec-Websocket-Key"]
     user_token = re.sub(r'[^A-Za-z0-9]', '', web_socket_key)
 
+    try:
+        create_schema_and_tables(schema_name=user_token)
+
+    # handle situation when schema already exists for a user
+    except ProgrammingError:
+        pass
+
     # run config queries
     run_queries_in_schema(schema_name=user_token, query_list=config_queries)
 
