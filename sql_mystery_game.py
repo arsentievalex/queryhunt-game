@@ -19,7 +19,7 @@ def show_hint(hint_prompt):
     if hint_button and st.session_state.ai_story is not None:
         with st.spinner("Thinking..."):
             
-            query_engine = get_query_engine()
+            query_engine = get_query_engine(vs_store)
             response = query_engine.query(hint_prompt.format(story=st.session_state.ai_story,
                                                              queries=st.session_state.user_queries,
                                                              hints=st.session_state.ai_hints))
