@@ -243,7 +243,7 @@ with col1:
         except Exception as e:
             st.error("Oops...something went wrong. Please try again!")
             # for debugging
-            st.error(e)
+            # st.error(e)
 
 
 with col2:
