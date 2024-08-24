@@ -142,7 +142,16 @@ def get_vs_store(retries=3, delay=5):
                 vector_dimension=1536,
                 drop_existing_table=False,
             )
-            return VectorStoreIndex.from_vector_store(vector_store=tidbvec)
+            vs_store = VectorStoreIndex.from_vector_store(vector_store=tidbvec)
+
+            # Create the query engine using the loaded index
+            llm = OpenAI("gpt-4o-mini", temperature=1)
+            
+            query_engine = vs_store.as_query_engine(llm=llm, streaming=True, filters=MetadataFilters(
+                filters=[MetadataFilter(key="schema", value="sql_mystery_game",
+                                        operator="==")]))
+            
+            return query_engine
         
         except OperationalError as e:
             if attempt < retries - 1:
@@ -153,25 +162,15 @@ def get_vs_store(retries=3, delay=5):
                 raise  # Re-raise the exception if all retries fail
 
 
-def get_vs_store_with_retry(retries=3, delay=5):
-    for attempt in range(retries):
-        try:
-            return get_vs_store()
-        except OperationalError as e:
-            if attempt < retries - 1:
-                time.sleep(delay)
-            else:
-                raise e
+# def get_query_engine(vs_store):
 
-def get_query_engine(vs_store):
-
-    llm = OpenAI("gpt-4o-mini", temperature=1)
+#     llm = OpenAI("gpt-4o-mini", temperature=1)
     
-    # Create the query engine using the loaded index
-    query_engine = vs_store.as_query_engine(llm=llm, streaming=True, filters=MetadataFilters(
-        filters=[MetadataFilter(key="schema", value="sql_mystery_game",
-                                operator="==")]))
-    return query_engine
+#     # Create the query engine using the loaded index
+#     query_engine = vs_store.as_query_engine(llm=llm, streaming=True, filters=MetadataFilters(
+#         filters=[MetadataFilter(key="schema", value="sql_mystery_game",
+#                                 operator="==")]))
+#     return query_engine
 
 
 def create_schema_and_tables(schema_name: str):
