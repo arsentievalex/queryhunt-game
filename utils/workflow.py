@@ -17,7 +17,7 @@ from llama_index.core.workflow import (
 import os
 import streamlit as st
 from utils.utils import (clean_string, is_valid_sql, is_non_destructive,
-                   get_vs_store, run_queries_in_schema, get_query_engine, create_schema_and_tables)
+                   get_vs_store, run_queries_in_schema, create_schema_and_tables)
 
 
 # Set your OpenAI API key
@@ -119,8 +119,7 @@ class ValidatedSqlEvent(Event):
 
 
 # initialize vector store and create query index
-vs_store = get_vs_store()
-query_engine = get_query_engine(vs_store)
+query_engine = get_vs_store()
 
 
 # Define the workflow
