@@ -143,16 +143,15 @@ def add_to_leaderboard():
 
 def drop_temp_schema():
     # Get the current user's schema name
-    schema_name = st.session_state.get('current_user')
+    schema_name = st.session_state.current_user
     
     if schema_name:
         # Drop the temp schema safely using a parameterized query
         query = "DROP SCHEMA IF EXISTS %s;"
         
-        with get_connection() as conn:
+        with get_connection(autocommit=True) as conn
             with conn.cursor() as cursor:
-                cursor.execute(query, (schema_name,))
-                conn.commit()
+                cursor.execute(query, (schema_name))
 
 
 def get_current_user():
