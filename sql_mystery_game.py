@@ -155,7 +155,7 @@ def drop_temp_schema():
 
 
 def get_current_user():
-    user_token = st.context.headers["Sec-Websocket-Key"]
+    user_token = st.context.headers["X-Streamlit-User"]
     clean_token = re.sub(r'[^A-Za-z0-9]', '', user_token)
     
     if st.session_state.current_user is None:
