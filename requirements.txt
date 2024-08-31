@@ -1,12 +1,12 @@
 sqlglot
 pydantic
-llama-index==0.10.65
-llama-index-core==0.10.65
+llama-index
+llama-index-core
 streamlit==1.37.1
 sqlparse
 pymysql
 streamlit-ace
 openai
 SQLAlchemy
-llama-index-vector-stores-tidbvector==0.1.2
-tidb-vector==0.0.11
+llama-index-vector-stores-tidbvector
+tidb-vector
